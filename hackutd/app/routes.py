@@ -13,6 +13,7 @@ def index():
 
 @app.route("/explore")
 def explore():
+
     return render_template("explore.html", title="Explore")
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -54,3 +55,11 @@ def register():
         db.session.commit()
         return redirect(url_for('index'))
     return render_template("register.html", title="Register", form=form)
+
+@app.route("/create")
+def create():
+    form = PostForm()
+    if form.validate_on_submit():
+        #Add success message
+        return redirect(url_for('create'))
+    return render_template("create.html", title="Create", form=form)
