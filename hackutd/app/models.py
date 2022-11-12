@@ -18,5 +18,5 @@ class Post(db.Model):
     price = Column(Float)
 
     def __repr__(self):
-        return f"<User {self.username}>"
+        return f"<Post {self.id}>"
 
