@@ -36,3 +36,10 @@ class Followers(db.Model):
         return f"<Followers {self.id}>"
 
 
+class Likes(db.Model):
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    post_id = Column(Integer, ForeignKey('post.id'), nullable=False)
+
+    def __repr__(self):
+        return f"<Like {self.id}"
