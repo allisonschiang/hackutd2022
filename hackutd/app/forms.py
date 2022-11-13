@@ -57,4 +57,5 @@ class PostForm(FlaskForm):
 class SearchForm(FlaskForm):
    search_tag = StringField("Search Tag")
    search_artist = StringField("Search Artist")
+   search_price = FloatField("Price Range",validators=[NumberRange(min=0)])
    submit = SubmitField('Search')

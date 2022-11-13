@@ -18,18 +18,20 @@ def index():
 @app.route("/explore", methods=['GET','POST'])
 def explore():
     form = SearchForm()
-    post="nocontent"
+    post=""
     if form.validate_on_submit():
         artistid = User.query.filter_by(is_artist=True, username=form.search_artist.data ).first()
-        if artistid is not None:
-            post = Post.query.filter_by( artist_id =artistid.id).first()
-            if post is not None:
-                urlpath = post.image_path
-        print(post)
-        return render_template("explore.html", title="Explore", post = urlpath, form=form, x=post)
+        if artistid is not None: #if searched artist exists
+            post = Post.query.filter_by( artist_id =artistid.id ) #gets posts of artist
+            affordable = post.query.filter_by(post.price<form.search_price.data) #checks posts for those in price range
+            if affordable is not None: #if there is art in price range
+                tags = affordable.query.filter(affordable.tag.in_(form.search_tag.data)) #checks posts for those matching tags
+                if tags is not None: #tags should be all posts tht match artist, price range, and tags
+                    return render_template("explore.html", title="Explore", post = urlpath, form=form, x=post)
+        flash("No mathing pictures found")
     else:
         flash("Error")
-    return render_template("explore.html", title="Explore", post = post, form=form)
+    return render_template("explore.html", title="Explore", post = tags, form=form)
 
 
 

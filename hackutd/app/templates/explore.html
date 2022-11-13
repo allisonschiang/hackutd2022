@@ -9,7 +9,12 @@
             {{ wtf.quick_form(form) }}
         </div>
     </div>
-    <img src={{post}}>
+    {% with x = get_flashed_messages()%}
+    {% if x != None %}
+        {{tags}}
+    {%else%}
+        {{x}}
+    {% endif %}
 
 {% endblock %}
 
