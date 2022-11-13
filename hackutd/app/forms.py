@@ -26,6 +26,7 @@ class PostForm(FlaskForm):
          raise ValidationError("Expected image file in jpg or png format")
 
    caption = TextAreaField('A Descriptive Caption', validators=[DataRequired()])
+   tags = StringField('A comma separated list of tags describing your work')
    price = FloatField('Price', validators=[NumberRange(min=0)])
    submit = SubmitField('Create')
 
