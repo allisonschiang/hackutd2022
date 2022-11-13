@@ -1,9 +1,11 @@
 from flask import render_template, flash, redirect, url_for, request
 from app import app, db
-from app.forms import LoginForm, RegistrationForm
+from app.forms import LoginForm, RegistrationForm, PostForm
 from flask_login import current_user, login_user, logout_user, login_required
-from app.models import User
+from app.models import *
 from werkzeug.urls import url_parse
+import os
+import datetime
 
 @app.route("/")
 @app.route("/index")
@@ -57,9 +59,19 @@ def register():
     return render_template("register.html", title="Register", form=form)
 
 @app.route("/create", methods=['GET', 'POST'])
+@login_required
 def create():
     form = PostForm()
     if form.validate_on_submit():
-        #Add success message
-        return redirect(url_for('create'))
+        img = form.image.data
+        path = os.path.join(app.instance_path, 'posts', img.filename)
+        img.save(path)
+        tags = [s.strip() for s in form.tags.data.split(",")]
+        new_post = Post(image_path=path, caption=form.caption.data, posted_at=datetime.datetime.now(), price=form.price.data)
+        new_post.tags += tags
+        current_user.posts.append(new_post)
+        db.session.add(new_post)
+        db.session.commit()
+
+        return redirect(url_for('index'))
     return render_template("create.html", title="Create", form=form)
