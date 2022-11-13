@@ -124,7 +124,7 @@ def user(username):
 @app.route("/listing/<post_id>")
 def listing(post_id):
     post = Post.query.filter_by(id=post_id).first_or_404()
-    artist = User.query.filter_by(id=post.artist_id)
+    artist = User.query.filter_by(id=post.artist_id).first()
     return render_template('listing.html', post=post, artist=artist)
 
 @app.route("/success")
