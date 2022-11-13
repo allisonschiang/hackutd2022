@@ -22,9 +22,14 @@ def explore():
     if form.validate_on_submit():
         tag_list = form.search_tag.data.split(", ")
         posts = [t.post for t in Tag.query.filter(Tag.tag.in_(tag_list)).all() if t.post.artist.username == form.search_artist.data]
+            
         if not posts:
             flash("No matching pictures found")
-        return render_template("explore.html", title="Explore", posts=posts, form=form)
+        post_cols = [[], [], []]
+        for i in range(len(posts)):
+            post_cols[i % 3].append(posts[i])
+        print(post_cols)
+        return render_template("explore.html", title="Explore", posts=post_cols, form=form)
     else:
         flash("Error")
     return render_template("explore.html", title="Explore", posts=[], form=form)
