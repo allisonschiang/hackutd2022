@@ -1,7 +1,7 @@
 from wsgiref.validate import validator
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, FileField, TextAreaField, FloatField
-from wtforms.validators import DataRequired, EqualTo, NumberRange, Regexp
+from wtforms.validators import ValidationError, DataRequired, EqualTo, NumberRange, Regexp
 
 class LoginForm(FlaskForm):
    username = StringField('Username', validators=[DataRequired()])
@@ -18,7 +18,15 @@ class RegistrationForm(FlaskForm):
    submit = SubmitField('Register')
 
 class PostForm(FlaskForm):
-   image = FileField('Upload Image', validators=[DataRequired(), Regexp(u'^.*\.jpg$')])
+   image = FileField('Upload Image', validators=[DataRequired()])
+   def validate_image(self, image):
+      if image.data.filename.endswith(".jpg") or image.data.filename.endswith(".png"):
+         return
+      else:
+         raise ValidationError("Expected image file in jpg or png format")
+
    caption = TextAreaField('A Descriptive Caption', validators=[DataRequired()])
    price = FloatField('Price', validators=[NumberRange(min=0)])
    submit = SubmitField('Create')
+
+
