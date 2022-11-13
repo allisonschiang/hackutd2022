@@ -43,7 +43,7 @@ def logout():
 def profile():
     return render_template("profile.html", title="Profile")
 
-@app.route("/register", methods=["GET", "POST"])
+@app.route("/register", methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
         return redirect(url_for("index"))
@@ -56,7 +56,7 @@ def register():
         return redirect(url_for('index'))
     return render_template("register.html", title="Register", form=form)
 
-@app.route("/create")
+@app.route("/create", methods=['GET', 'POST'])
 def create():
     form = PostForm()
     if form.validate_on_submit():
