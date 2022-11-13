@@ -15,12 +15,7 @@ def index():
     print("hi")
     return render_template("index.html", title="Home")
 
-<<<<<<< HEAD
-
-@app.route("/explore")
-=======
 @app.route("/explore", methods=['GET','POST'])
->>>>>>> 65db5eb (added explore page and routes.py route for explore)
 def explore():
     form = SearchForm()
     post="nocontent"
@@ -113,7 +108,6 @@ def create():
         db.session.add(new_post)
         db.session.commit()
 
-<<<<<<< HEAD
         return redirect(url_for("index"))
     return render_template("create.html", title="Create", form=form)
     
@@ -122,7 +116,3 @@ def user(username):
     user = User.query.filter_by(username=username).first_or_404()
     posts = User.query.filter_by(username=username).first().posts
     return render_template('artistpage.html', user=user, posts=posts)
-=======
-        return redirect(url_for('index'))
-    return render_template("create.html", title="Create", form=form)
->>>>>>> 65db5eb (added explore page and routes.py route for explore)

@@ -50,14 +50,11 @@ class PostForm(FlaskForm):
         else:
             raise ValidationError("Expected image file in jpg or png format")
 
-<<<<<<< HEAD
     caption = TextAreaField("A Descriptive Caption", validators=[DataRequired()])
     tags = StringField("A comma separated list of tags describing your work")
     price = FloatField("Price", validators=[NumberRange(min=0)])
     submit = SubmitField("Create")
-=======
 class SearchForm(FlaskForm):
    search_tag = StringField("Search Tag")
    search_artist = StringField("Search Artist")
    submit = SubmitField('Search')
->>>>>>> 65db5eb (added explore page and routes.py route for explore)
