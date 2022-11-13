@@ -1,7 +1,7 @@
 from wsgiref.validate import validator
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, FileField, TextAreaField, FloatField
-from wtforms.validators import DataRequired, EqualTo, NumberRange
+from wtforms.validators import DataRequired, EqualTo, NumberRange, Regexp
 
 class LoginForm(FlaskForm):
    username = StringField('Username', validators=[DataRequired()])
@@ -18,7 +18,7 @@ class RegistrationForm(FlaskForm):
    submit = SubmitField('Register')
 
 class PostForm(FlaskForm):
-   image = FileField('Upload Image', validators=[DataRequired()])
+   image = FileField('Upload Image', validators=[DataRequired(), Regexp(u'^.*\.jpg$')])
    caption = TextAreaField('A Descriptive Caption', validators=[DataRequired()])
    price = FloatField('Price', validators=[NumberRange(min=0)])
    submit = SubmitField('Create')
