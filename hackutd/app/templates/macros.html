@@ -13,3 +13,12 @@
     </div>
 </div>
 {%- endmacro %}
+
+{% macro single(post, tags) -%}
+<div class="post">
+    <h5>{{ post.artist.username }}</h5>
+    <img src="{{ post.image_path }}">
+    <p>Tags: {{ tags }}</p>
+    <p>{{ post.caption }}</p>
+</div>
+{%- endmacro %}
