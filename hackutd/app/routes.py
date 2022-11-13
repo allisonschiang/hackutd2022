@@ -12,6 +12,17 @@ import hashlib
 @app.route("/")
 @app.route("/index")
 def index():
+    if current_user.is_authenticated:
+        to_show_in_feed = [f.followee for f in Followers.query.filter_by(follower=current_user.id).all()]
+        print(to_show_in_feed)
+        posts = []
+        for followee in to_show_in_feed:
+            f_posts = User.query.get(followee).posts
+            posts += f_posts
+        posts.sort(key=lambda x:x.posted_at, reverse=True)
+        print(posts)
+        posts = [(post, ", ".join([t.tag for t in post.tags])) for post in posts]
+        return render_template("index.html", title="Home", posts=posts)
     return render_template("index.html", title="Home")
 
 
