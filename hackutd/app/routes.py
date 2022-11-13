@@ -8,21 +8,25 @@ import os
 import datetime
 import hashlib
 
-@app.route("/")
 
+@app.route("/")
 @app.route("/index")
 def index():
-    print("hi")
     return render_template("index.html", title="Home")
 
-@app.route("/explore", methods=['GET','POST'])
+
+@app.route("/explore", methods=["GET", "POST"])
 def explore():
     form = SearchForm()
-    post=""
+    post = ""
     if form.validate_on_submit():
         tag_list = form.search_tag.data.split(", ")
-        posts = [t.post for t in Tag.query.filter(Tag.tag.in_(tag_list)).all() if t.post.artist.username == form.search_artist.data]
-            
+        posts = [
+            t.post
+            for t in Tag.query.filter(Tag.tag.in_(tag_list)).all()
+            if t.post.artist.username == form.search_artist.data
+        ]
+
         if not posts:
             flash("No matching pictures found")
         post_cols = [[], [], []]
@@ -31,7 +35,6 @@ def explore():
         print(post_cols)
         return render_template("explore.html", title="Explore", posts=post_cols, form=form)
     return render_template("explore.html", title="Explore", posts=[], form=form)
-
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -62,17 +65,19 @@ def edit_profile():
         username = current_user.username
         db.session.add(current_user)
         db.session.commit()
-        return redirect(f'/profile/{username}')
-    elif request.method == 'GET':
+        return redirect(f"/profile/{username}")
+    elif request.method == "GET":
         form.username.data = current_user.username
         form.bio.data = current_user.bio
         form.name.data = current_user.name
-    return render_template('edit_profile.html', title = 'Edit Profile', form=form)
+    return render_template("edit_profile.html", title="Edit Profile", form=form)
+
 
 @app.route("/logout")
 def logout():
     logout_user()
     return redirect(url_for("index"))
+
 
 @app.route("/profile/<username>")
 def profile(username):
@@ -112,7 +117,11 @@ def create():
     if form.validate_on_submit():
         img = form.image.data
         file_extension = img.filename[-3:]
-        hasher = hashlib.sha256(f"{img.filename}{current_user.username}{datetime.datetime.now()}".encode("utf-8"))
+        hasher = hashlib.sha256(
+            f"{img.filename}{current_user.username}{datetime.datetime.now()}".encode(
+                "utf-8"
+            )
+        )
         new_filename = f"{hasher.hexdigest()}.{file_extension}"
         path = os.path.join(app.static_folder, "img", new_filename)
         img.save(path)
@@ -130,20 +139,23 @@ def create():
 
         return redirect(url_for("index"))
     return render_template("create.html", title="Create", form=form)
-    
+
+
 @app.route("/artistpage/<username>")
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
     posts = User.query.filter_by(username=username).first().posts
-    return render_template('artistpage.html', user=user, posts=posts)
+    return render_template("artistpage.html", user=user, posts=posts)
+
 
 @app.route("/listing/<post_id>")
 def listing(post_id):
     post = Post.query.filter_by(id=post_id).first_or_404()
     artist = User.query.filter_by(id=post.artist_id).first()
-    return render_template('listing.html', post=post, artist=artist)
+    return render_template("listing.html", post=post, artist=artist)
+
 
 @app.route("/success")
 def success():
     username = current_user.username
-    return render_template('success.html', username=username)
+    return render_template("success.html", username=username)
