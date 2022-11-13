@@ -26,18 +26,56 @@ def index():
         return render_template("index.html", title="Home", posts=posts)
     return render_template("index.html", title="Home")
 
+@app.route("/follow/<int:user_id>")
+@login_required
+def follow(user_id):
+    user = User.query.get(user_id)
+    f = Followers(follower=current_user.id, followee=user_id)
+    db.session.add(f)
+    db.session.commit()
+    return redirect(f"/profile/{user.username}")
+
+@app.route("/unfollow/<int:user_id>")
+@login_required
+def unfollow(user_id):
+    user = User.query.get(user_id)
+    f = Followers.query.filter_by(follower=current_user.id, followee=user_id).first()
+    if f:
+        db.session.delete(f)
+        db.session.commit()
+    return redirect(f"/profile/{user.username}")
+
 
 @app.route("/explore", methods=["GET", "POST"])
 def explore():
     form = SearchForm()
-    post = ""
     if form.validate_on_submit():
-        tag_list = form.search_tag.data.split(", ")
-        posts = [
-            t.post
-            for t in Tag.query.filter(Tag.tag.in_(tag_list)).all()
-            if t.post.artist.username == form.search_artist.data
-        ]
+        posts = []
+        (tags, artist, max_price) = (form.search_tag.data.split(", "), form.search_artist.data, form.search_price.data if form.search_price.data > 0 else None)
+        if tags:
+            posts = [t.post for t in Tag.query.filter(Tag.tag.in_(tags)).all()]
+        
+        if artist:
+            if posts:
+                posts = [post for post in posts if post.artist.username == artist]
+            else:
+                user = User.query.filter_by(username=artist).first()
+                if user:
+                    posts = user.posts
+                else:
+                    flash(f"No artist with username {artist} was found")
+        
+        if max_price:
+            if posts:
+                posts = [post for post in posts if post.price < max_price]
+            else:
+                posts = Post.query.filter(Post.price < max_price).all()
+
+            # posts = [
+            #     t.post
+            #     for t in Tag.query.filter(Tag.tag.in_(tag_list)).all()
+            #     if t.post.artist.username == form.search_artist.data and t.post.price < form.search_price.data
+            # ]
 
         if not posts:
             flash("No matching pictures found")
@@ -93,14 +131,33 @@ def logout():
 
 @app.route("/profile/<username>")
 def profile(username):
-    user = User.query.filter_by(username=username).first_or_404()
-    name = user.name
+    if current_user.is_authenticated:
+        if current_user.username == username:
+            posts = current_user.posts
+            columns = [[], [], []]
+            for i in range(len(posts)):
+                columns[i % 3].append(posts[i])
+
+            return render_template("profile.html", user=current_user, posts=columns, title="Profile")
+        else:
+            following = False
+            user = User.query.filter_by(username=username).first()
+            posts = user.posts
+            columns = [[], [], []]
+            for i in range(len(posts)):
+                columns[i % 3].append(posts[i])
+
+            if Followers.query.filter_by(follower=current_user.id, followee=user.id).first():
+                following = True
+            return render_template("profile.html", user=user, posts=columns, title="Profile", following=following)
+
+    user = User.query.filter_by(username=username).first()
     posts = user.posts
     columns = [[], [], []]
     for i in range(len(posts)):
         columns[i % 3].append(posts[i])
 
-    return render_template("profile.html", user=user, posts=columns, title="Profile")
+    return render_template("profile.html", user=user, posts=columns, title="Profile", following=False)
 
 
 @app.route("/register", methods=["GET", "POST"])
