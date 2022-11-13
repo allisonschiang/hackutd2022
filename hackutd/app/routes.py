@@ -1,6 +1,6 @@
 from flask import render_template, flash, redirect, url_for, request
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, PostForm
+from app.forms import LoginForm, RegistrationForm, PostForm, SearchForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import *
 from werkzeug.urls import url_parse
@@ -15,11 +15,27 @@ def index():
     print("hi")
     return render_template("index.html", title="Home")
 
+<<<<<<< HEAD
 
 @app.route("/explore")
+=======
+@app.route("/explore", methods=['GET','POST'])
+>>>>>>> 65db5eb (added explore page and routes.py route for explore)
 def explore():
+    form = SearchForm()
+    post="nocontent"
+    if form.validate_on_submit():
+        artistid = User.query.filter_by(is_artist=True, username=form.search_artist.data ).first()
+        if artistid is not None:
+            post = Post.query.filter_by( artist_id =artistid.id).first()
+            if post is not None:
+                urlpath = post.image_path
+        print(post)
+        return render_template("explore.html", title="Explore", post = urlpath, form=form, x=post)
+    else:
+        flash("Error")
+    return render_template("explore.html", title="Explore", post = post, form=form)
 
-    return render_template("explore.html", title="Explore")
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -97,6 +113,7 @@ def create():
         db.session.add(new_post)
         db.session.commit()
 
+<<<<<<< HEAD
         return redirect(url_for("index"))
     return render_template("create.html", title="Create", form=form)
     
@@ -105,3 +122,7 @@ def user(username):
     user = User.query.filter_by(username=username).first_or_404()
     posts = User.query.filter_by(username=username).first().posts
     return render_template('artistpage.html', user=user, posts=posts)
+=======
+        return redirect(url_for('index'))
+    return render_template("create.html", title="Create", form=form)
+>>>>>>> 65db5eb (added explore page and routes.py route for explore)
