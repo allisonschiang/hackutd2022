@@ -14,6 +14,7 @@ import hashlib
 def index():
     if current_user.is_authenticated:
         to_show_in_feed = [f.followee for f in Followers.query.filter_by(follower=current_user.id).all()]
+        to_show_in_feed.append(current_user.id)
         print(to_show_in_feed)
         posts = []
         for followee in to_show_in_feed:
